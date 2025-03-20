@@ -7,7 +7,7 @@ class UserRec:
 
     def __init__(self):
         self.model = Model()
-        self.consultants = consultant_repository.list()[:4]
+        self.consultants = consultant_repository.consultant_list()[:4]
         self.model.append_history("system", "You are an AI that asks targeted questions to match the user with the most similar person in a given dataset.")
         
     def clear_history(self):
@@ -96,8 +96,9 @@ class UserRec:
             for response in user_responses:
                 self.model.append_history("assistant", response["question"])
                 self.model.append_history("user", response["answer"])
-        print("hey: ", self.model.history)
-        response = self.model.answer() 
+        response = self.model.answer()
+        print("hey: ", response)
+        
         return response.output[0].content[0].text
 
         
