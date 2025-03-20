@@ -1,8 +1,10 @@
 from pydantic import BaseModel
 from typing import Optional
+from pydantic_mongo import PydanticObjectId
+from pydantic import Field
 
 class Consultant(BaseModel):
-    _id: str
+    id: PydanticObjectId = Field(alias="_id")
     uid: Optional[str] = None
     category: Optional[str] = None
     institution: Optional[str] = None

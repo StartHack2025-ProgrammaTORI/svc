@@ -1,7 +1,7 @@
 from svc.utils.dataset import questions, answers
 from svc.utils.userRecomendation import userRec
 from svc.utils.database import db
-from .schema import Question
+from .schema import Question, QuestionAnswer
 from bson import ObjectId  # Add this import for ObjectId
 from datetime import datetime
 
@@ -44,17 +44,52 @@ def answer_question(index_question: int, index_answer: str, uid: str):
     if (index_question > len(questions)):
         raise Exception("Index out of range")
     question = questions[index_question]
-    print("body: ", {
-            'question': question['id'],
-            'answer': index_answer
-        })
     save_answer(
         {
             'question': question['id'],
             'answer': index_answer
         }
     )
+    questions = get_questions(uid)
     return {
         **questions[index_question],
         'index': index_question + 1
     }
+    
+def get_questions_and_answers(uid: str):
+    print("uid: ", uid)
+    data = db.question.aggregate([
+        {
+            '$match':
+            {
+                'uid': uid
+            }
+        },
+        {
+            "$set": {
+            "answer": {
+                "$arrayElemAt": [
+                {
+                    "$filter": {
+                    "input": "$options",
+                    "as": "option",
+                    "cond": {
+                        "$eq": ["$$option.id", "$answer"]
+                    }
+                    }
+                },
+                0
+                ]
+            }
+            }
+        },
+        {
+            "$project": {
+                "_id": 0,
+                "question": 1,
+                "answer": "$answer.text"
+            }
+        }
+    ])
+    data = [QuestionAnswer(**item).dict() for item in data]
+    return data

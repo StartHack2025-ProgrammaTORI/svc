@@ -21,3 +21,6 @@ def create_consultant(body: Consultant):
 
 def get_consultant(_id: str):
     return db.company.find_one({"_id": _id})
+
+def get_consultant_by_uid(uid: str):
+    return db.company.find_one({"uid": uid})

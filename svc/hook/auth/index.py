@@ -12,4 +12,5 @@ async def validate_token(request: Request):
         request.state.user = decoded_token  # Attach user info to the request state
         return decoded_token
     except Exception as e:
+        print(e)
         raise HTTPException(status_code=401, detail="Invalid token")

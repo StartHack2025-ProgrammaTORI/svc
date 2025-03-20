@@ -7,7 +7,7 @@ class UserRec:
 
     def __init__(self):
         self.model = Model()
-        self.consultants = consultant_repository.consultant_list()[:4]
+        self.consultants = consultant_repository.consultant_list()[:20]
         self.model.append_history("system", "You are an AI that asks targeted questions to match the user with the most similar person in a given dataset.")
         
     def clear_history(self):
@@ -55,8 +55,8 @@ class UserRec:
                             "items": {
                                 "type": "string"
                             },
-                            "minItems": 3,
-                            "maxItems": 3,
+                            "minItems": 5,
+                            "maxItems": 5,
                             "description": "An array containing three possible answer options."
                         }
                     },
@@ -86,9 +86,12 @@ class UserRec:
     def find_best_match(self, user_responses):
         self.model.clear_history()
         system_instruction = f"""
-        Your goal is to find the best match using the dataset provided and the user's responses:
+        Your goal is to find the best match consultant using the dataset of consultants provided and the user's responses:
         
-        Dataset:
+        Rules:
+        - Return a JSON with: "reason" and "_id".
+        
+        Consultants:
         {self.consultants}
         """
         self.model.append_history("system", system_instruction)
@@ -96,10 +99,48 @@ class UserRec:
             for response in user_responses:
                 self.model.append_history("assistant", response["question"])
                 self.model.append_history("user", response["answer"])
-        response = self.model.answer()
-        print("hey: ", response)
         
-        return response.output[0].content[0].text
+        response = self.model.answer(  # Include the chat history
+        functions=[  # Pass function definitions
+            {
+                "name": "best_match_consultant",
+                "description": "Identifies up to four best-matching consultants from the dataset based on the user's responses and provides a brief explanation for each.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                    "consultants": {
+                        "type": "array",
+                        "description": "A list of up to four recommended consultants with their _id and reason for selection.",
+                        "items": {
+                        "type": "object",
+                        "properties": {
+                            "_id": {
+                            "type": "string",
+                            "description": "The _id field of the recommended consultant."
+                            },
+                            "reason": {
+                            "type": "string",
+                            "description": "Explanation for why this consultant is a best match."
+                            }
+                        },
+                        "required": ["_id", "reason"]
+                        },
+                        "maxItems": 3,
+                        "minItems": 2
+                    }
+                    },
+                    "required": ["consultants"]
+                }
+            }
+        ],
+        function_call={"name": "best_match_consultant"}
+        )
+        
+        response = response.choices[0].message.function_call.arguments
+        parsed_response = json.loads(response)
+        
+        return parsed_response
+
 
         
 

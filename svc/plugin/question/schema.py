@@ -16,3 +16,6 @@ class Question(BaseModel):
     answer: Optional[str] = None
     created_at: datetime = datetime.now()
 
+class QuestionAnswer(BaseModel):
+    question: str
+    answer: str

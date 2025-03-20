@@ -23,7 +23,7 @@ class Model:
     def clear_history(self):
         self.history = []
 
-    def answer(self, prompt=None, functions=None):
+    def answer(self, prompt=None, functions=None, function_call=None):
         if prompt is not None:
             self.history.append(
                 {
@@ -32,11 +32,12 @@ class Model:
                 }
             )
         if functions is not None:
+            print("brodooo: ",functions)
             return self.client.chat.completions.create(
                 model=self.model,
                 messages=self.history,
                 functions=functions,
-                function_call="auto"
+                function_call=function_call if function_call is not None else "auto"
             )
         return self.client.responses.create(
             model=self.model,

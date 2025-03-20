@@ -13,7 +13,7 @@ from svc.utils.database import mongo_client
 from svc.plugin.consultant import controller as consultant_controller
 from svc.plugin.question import controller as question_controller
 from svc.plugin.todo import controller as todo_controller
-from svc.plugin.recomendation import controller as recommendation_controller
+from svc.plugin.proposal import controller as recommendation_controller
 
 app = FastAPI(version=os.environ["VERSION"])  # Added version prefix
 
