@@ -27,6 +27,7 @@ async def get_proposals(user: dict = Depends(validate_token)):
     if my_company == None:
         return {"message": "Consultant not found", "data": [] }
     proposals = repository_proposal.find_proposals(str(db_user['company']))
+    print("len: ", len(proposals))
     if len(proposals) == 0:
         questions = question_repository.get_questions_and_answers(user['uid'])
         recomendations = userRec.find_best_match(questions)
