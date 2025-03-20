@@ -1,10 +1,14 @@
 from svc.utils.dataset import questions, answers
+from svc.utils.userRecomendation import userRec
 
 def get_question(index: int = None):
     if (index == None):
         index = 0
-    if (index >= len(questions)):
-        return {}
+    if index >= len(questions):
+        print('answers', answers)
+        question = userRec.get_next_question(answers)
+        if question not in [q['question'] for q in questions]:
+            questions.append(question)
     return {
         **questions[index],
         'index': index + 1

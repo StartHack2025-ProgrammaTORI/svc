@@ -1,6 +1,7 @@
 import os
+from openai import OpenAI
 
-class OpenAI:
+class Model:
     history = []
 
     def __init__(self):
@@ -22,16 +23,22 @@ class OpenAI:
     def clear_history(self):
         self.history = []
 
-    def answer(self, prompt): 
-        self.history.append(
-            {
-                "role": "user",
-                "content": prompt
-            }
-        )
+    def answer(self, prompt=None, functions=None):
+        if prompt is not None:
+            self.history.append(
+                {
+                    "role": "user",
+                    "content": prompt
+                }
+            )
+        if functions is not None:
+            return self.client.chat.completions.create(
+                model=self.model,
+                messages=self.history,
+                functions=functions,
+                function_call="auto"
+            )
         return self.client.responses.create(
-            model="gpt-4o-mini",
+            model=self.model,
             input=self.history,
         )
-        
-openai = OpenAI()

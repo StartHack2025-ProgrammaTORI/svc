@@ -8,6 +8,7 @@ load_dotenv()
 from svc.plugin.consultant import controller as consultant_controller
 from svc.plugin.question import controller as question_controller
 from svc.plugin.todo import controller as todo_controller
+from svc.plugin.recomendation import controller as recommendation_controller
 
 app = FastAPI(version=os.environ["VERSION"])  # Added version prefix
 
@@ -23,6 +24,7 @@ app.add_middleware(
 app.include_router(consultant_controller.router)
 app.include_router(question_controller.router)
 app.include_router(todo_controller.router)
+app.include_router(recommendation_controller.router)
 
 @app.get("/")
 def read_root():
