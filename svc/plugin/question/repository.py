@@ -3,8 +3,8 @@ from svc.utils.dataset import questions, answers
 def get_question(index: int = None):
     if (index == None):
         index = 0
-    if (index > len(questions)):
-        raise Exception("Index out of range")
+    if (index >= len(questions)):
+        return {}
     return {
         **questions[index],
         'index': index + 1

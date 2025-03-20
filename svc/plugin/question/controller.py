@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from . import repository
-router = APIRouter(prefix="/companies", tags=["companies"])
+router = APIRouter(prefix="/questions", tags=["questions"])
 
 @router.get("")
 async def get_question(index: int = None):

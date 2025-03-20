@@ -41,4 +41,29 @@ questions = [
     }
 ]
 
+todos = [
+    {
+        "id": 0,
+        "project": "FastAPI",
+        "description": "Create a new project",
+        "steps": [
+            "Create a new project using FastAPI",
+            "Add a new endpoint to the project",
+            "Test the new endpoint using the Swagger UI"
+        ],
+        "current_step": 0
+    },
+        {
+        "id": 1,
+        "project": "FastAPI",
+        "description": "Create a new project",
+        "steps": [
+            "Create a new project using FastAPI",
+            "Add a new endpoint to the project",
+            "Test the new endpoint using the Swagger UI"
+        ],
+        "current_step": 0
+    }
+]
+
 answers = []
