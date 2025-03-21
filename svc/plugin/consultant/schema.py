@@ -13,3 +13,7 @@ class Consultant(BaseModel):
     focus_areas: Optional[str] = None
     contact: Optional[str] = None
     website: Optional[str] = None
+    revenue: Optional[str] = None
+    is_b2b: Optional[bool] = None
+    black_list_company: list[str] = []
+    black_list_focus_area: list[str] = []
