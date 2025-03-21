@@ -19,7 +19,6 @@ async def update_proposal(
     db_user = consultant_repository.get_user(user['uid'])
     my_company = consultant_repository.get_consultant(db_user['company'])
     proposal = repository_proposal.get_proposal(id)
-    print("proposal:", proposal)
     if body['status'] == "REJECTED" and body['decision'] is not None:
         if str(my_company['_id']) == str(proposal['consultancy_receiver']['id']):
             consultant_repository.update_black_list(my_company['_id'], body['decision'], proposal['consultancy_provider'])
@@ -44,7 +43,11 @@ async def get_proposals(role: Role, user: dict = Depends(validate_token)):
     )
     
     proposals = repository_proposal.find_proposals(str(db_user['company']), role)
-    if len(proposals) == 0 and role == Role.RECEIVER:
+    recomend = True
+    for proposal in proposals:
+        if proposal.status != 'REJECTED':
+            recomend = False
+    if recomend and role == Role.RECEIVER:
         questions = question_repository.get_questions_and_answers(user['uid'])
         recomendations = userRec.find_best_match(questions)
         for recomendation in recomendations['consultants']:

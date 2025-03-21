@@ -7,7 +7,8 @@ def create_proposal(proposal: InputProposal):
 
 def find_proposals(company_id: str, role: Role):
     pipeline = [
-        {'$match': {'consultancy_receiver': company_id} if role == Role.RECEIVER else {'consultancy_provider': company_id}},
+        {'$match': {
+            'consultancy_receiver': company_id} if role == Role.RECEIVER else {'consultancy_provider': company_id}},
         {
             '$addFields': {
                 'consultancy_receiver_obj': {'$toObjectId': '$consultancy_receiver'},
