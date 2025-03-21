@@ -14,7 +14,7 @@ class Status(str, Enum):
     
 class Role(str, Enum):
     RECEIVER = "RECEIVER"
-    SENDER = "SENDER"
+    SENDER = "PROVIDER"
     
 class InputProposal(BaseModel):
     consultancy_receiver: str # company id
