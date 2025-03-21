@@ -36,7 +36,7 @@ async def update_consultant(
     my_company = repository.get_consultant(db_user['company'])
     repository.update_consultant_details(
         my_company['_id'],
-        body["name"],
+        body["name"] if "name" in body else None,
         body["description"] if "description" in body else None,
         body["contact"] if "contact" in body else None,
         body["revenue"] if "revenue" in body else None,
