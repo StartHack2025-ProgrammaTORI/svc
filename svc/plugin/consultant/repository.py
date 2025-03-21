@@ -1,7 +1,7 @@
 from svc.utils.dataset import read_csv
 import os
 from svc.utils.database import db
-from .schema import Consultant
+from .schema import Consultant, ConsultantPopulated
 from bson import ObjectId
 dataset = read_csv(os.environ["DB"])
 
@@ -27,6 +27,41 @@ def create_consultant(body: Consultant):
 
 def get_consultant(_id: str):
     return db.company.find_one({"_id": _id})
+
+def get_consultant_populated(_id: str):
+    result = db.company.aggregate([
+        {
+            "$match":
+
+            {
+                "_id": ObjectId(_id)
+            }
+        },
+        {
+            "$addFields": {
+            "black_list_company": {
+                "$map": {
+                "input": "$black_list_company",
+                "as": "id",
+                "in": {
+                    "$toObjectId": "$$id"
+                }
+                }
+            }
+            }
+        },
+        {
+        "$lookup":
+            {
+            "from": "company",
+            "localField": "black_list_company",
+            "foreignField": "_id",
+            "as": "black_list_company"
+            }
+        },
+    ])
+    result = [ConsultantPopulated(**p).dict() for p in result]
+    return result[0]
 
 def get_consultant_by_uid(uid: str):
     return db.company.find_one({"uid": uid})

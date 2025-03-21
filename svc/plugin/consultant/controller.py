@@ -8,8 +8,8 @@ router = APIRouter(prefix="/consultants", tags=["consultants"])
 @router.get("")
 async def get_consultant(user: dict = Depends(validate_token)):
     db_user = repository.get_user(user['uid'])
-    my_company = repository.get_consultant(db_user['company'])
-    my_company['_id'] = str(my_company['_id'])
+    my_company = repository.get_consultant_populated(db_user['company'])
+    my_company['_id'] = str(my_company['id'])
     return {"message": "Consultant created successfully", "data": my_company}
 
 @router.post("")
