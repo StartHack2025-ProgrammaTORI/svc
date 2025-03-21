@@ -1,13 +1,13 @@
 from svc.utils.database import db
-from .schema import InputProposal, ProposalPopulated
+from .schema import InputProposal, ProposalPopulated, Role
 from bson import ObjectId  # Import ObjectId for querying by ID
 
 def create_proposal(proposal: InputProposal):
     db.proposal.insert_one(proposal.dict())
 
-def find_proposals(company_id: str):
+def find_proposals(company_id: str, role: Role):
     pipeline = [
-        {'$match': {'consultancy_receiver': company_id}},
+        {'$match': {'consultancy_receiver': company_id} if role == Role.RECEIVER else {'consultancy_provider': company_id}},
         {
             '$addFields': {
                 'consultancy_receiver_obj': {'$toObjectId': '$consultancy_receiver'},

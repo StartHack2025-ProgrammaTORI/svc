@@ -5,7 +5,7 @@ from svc.utils.dataset import answers
 from svc.plugin.question import repository as question_repository
 from svc.plugin.consultant import repository as consultant_repository
 from . import repository as repository_proposal
-from .schema import InputProposal
+from .schema import InputProposal, Role
 
 router = APIRouter(prefix="/proposals", tags=["proposals"])
 
@@ -13,21 +13,21 @@ router = APIRouter(prefix="/proposals", tags=["proposals"])
 async def update_proposal(
     id: str,
     body: dict,
+    role: Role,
     user: dict = Depends(validate_token)
     ):
     db_user = consultant_repository.get_user(user['uid'])
     repository_proposal.update_proposal_status(id, body['status'])
-    proposals = repository_proposal.find_proposals(str(db_user['company']))
+    proposals = repository_proposal.find_proposals(str(db_user['company']), role)
     return {"message": "Consultant created successfully", "data": proposals }
 
 @router.get("")
-async def get_proposals(user: dict = Depends(validate_token)):
+async def get_proposals(role: Role, user: dict = Depends(validate_token)):
     db_user = consultant_repository.get_user(user['uid'])
     my_company = consultant_repository.get_consultant(db_user['company'])
     if my_company == None:
         return {"message": "Consultant not found", "data": [] }
-    proposals = repository_proposal.find_proposals(str(db_user['company']))
-    print("len: ", len(proposals))
+    proposals = repository_proposal.find_proposals(str(db_user['company']), role)
     if len(proposals) == 0:
         questions = question_repository.get_questions_and_answers(user['uid'])
         recomendations = userRec.find_best_match(questions)
@@ -39,5 +39,5 @@ async def get_proposals(user: dict = Depends(validate_token)):
                     reason_of_match=recomendation['reason']
                 )
             )
-    proposals = repository_proposal.find_proposals(str(db_user['company']))
+    proposals = repository_proposal.find_proposals(str(db_user['company']), role)
     return {"message": "Consultant created successfully", "data": proposals }
