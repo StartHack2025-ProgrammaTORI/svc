@@ -7,11 +7,25 @@ class UserRec:
 
     def __init__(self):
         self.model = Model()
-        self.consultants = consultant_repository.consultant_list()[:20]
+        self.consultants = consultant_repository.consultant_list()[:40]
+        consultants = []
+        for consunltant in self.consultants:
+            if 'is_b2b' in consunltant and consunltant['is_b2b'] == False:
+                continue
+            else:
+                consultants.append(consunltant)
+        self.consultants = consultants
         self.model.append_history("system", "You are an AI that asks targeted questions to match the user with the most similar person in a given dataset.")
     
     def set_consultants(self, black_list_focus_area=None, black_list_company=None):
         self.consultants = consultant_repository.consultant_list(black_list_focus_area, black_list_company)[:20]
+        consultants = []
+        for consunltant in self.consultants:
+            if 'is_b2b' in consunltant and consunltant['is_b2b'] == False:
+                continue
+            else:
+                consultants.append(consunltant)
+        self.consultants = consultants
 
     def add_my_company(self, my_company):
         self.model.append_history("system", f"Your company informations: {my_company}")
