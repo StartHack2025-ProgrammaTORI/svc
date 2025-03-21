@@ -13,11 +13,14 @@ class UserRec:
     def set_consultants(self, black_list_focus_area=None, black_list_company=None):
         self.consultants = consultant_repository.consultant_list(black_list_focus_area, black_list_company)[:20]
 
+    def add_my_company(self, my_company):
+        self.model.append_history("system", f"Your company informations: {my_company}")
+        
     def clear_history(self):
         self.model.clear_history()
         self.model.append_history("system", "You are an AI that asks targeted questions to match the user with the most similar person in a given dataset.")
 
-    def get_next_question(self, user_responses=None):
+    def get_next_question(self, user_responses=None, my_company=None):
         """Chiede all'LLM di generare una domanda basata sulle risposte dell'utente e sul dataset."""
         self.clear_history()
         system_instruction = f"""
@@ -32,7 +35,8 @@ class UserRec:
         """
 
         self.model.append_history("system", system_instruction)
-
+        if my_company is not None:
+            self.model.append_history("system", f"Your company informations: {my_company}")
         if user_responses is not None:
             for response in user_responses:
                 self.model.append_history("assistant", response["question"])

@@ -4,6 +4,7 @@ from svc.utils.database import db
 from .schema import Question, QuestionAnswer
 from bson import ObjectId  # Add this import for ObjectId
 from datetime import datetime
+from svc.plugin.consultant import repository as consultant_repository
 
 def get_questions(uid: str):
     db_results = db.question.find({'uid': uid})
@@ -13,11 +14,13 @@ def save_question(question: dict):
     db.question.insert_one(question)
   
 async def get_question(index: int = None, uid: str = None):
+    db_user = consultant_repository.get_user(uid)
+    my_company = consultant_repository.get_consultant(db_user['company'])
     questions = get_questions(uid)
     if (index == None):
         index = 0
     if index >= len(questions):
-        question = userRec.get_next_question(answers)
+        question = userRec.get_next_question(answers, my_company)
         save_question(
             {
                 "question": question['question'],

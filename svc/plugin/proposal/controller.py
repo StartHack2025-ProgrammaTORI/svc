@@ -37,6 +37,7 @@ async def get_proposals(role: Role, user: dict = Depends(validate_token)):
     if my_company == None:
         return {"message": "Consultant not found", "data": [] }
 
+    userRec.add_my_company(my_company['name'])
     userRec.set_consultants(
         my_company['black_list_area'] if 'black_list_area' in my_company else [], 
         my_company['black_list_company'] if 'black_list_company' in my_company else [],
