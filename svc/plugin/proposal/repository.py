@@ -7,8 +7,7 @@ def create_proposal(proposal: InputProposal):
 
 def find_proposals(company_id: str, role: Role):
     pipeline = [
-        {'$match': {
-            'consultancy_receiver': company_id} if role == Role.RECEIVER else {'consultancy_provider': company_id}},
+        {'$match': { 'consultancy_receiver': company_id} if role == Role.RECEIVER else {'consultancy_provider': company_id}},
         {
             '$addFields': {
                 'consultancy_receiver_obj': {'$toObjectId': '$consultancy_receiver'},
@@ -95,4 +94,6 @@ def get_proposal(proposal_id: str):
     ]
     data = db.proposal.aggregate(pipeline)
     data = [ProposalPopulated(**p) for p in data]
+    if (len(data) == 0):
+        raise Error('not found')
     return data[0].dict()

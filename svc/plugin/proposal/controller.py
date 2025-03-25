@@ -36,13 +36,14 @@ async def get_proposals(role: Role, user: dict = Depends(validate_token)):
     my_company = consultant_repository.get_consultant(db_user['company'])
     if my_company == None:
         return {"message": "Consultant not found", "data": [] }
-
-    userRec.add_my_company(my_company['name'])
+    my_infos = { **my_company }
+    del my_infos['description_embedded']
+    userRec.add_my_company(my_infos)
     userRec.set_consultants(
         my_company['black_list_area'] if 'black_list_area' in my_company else [], 
         my_company['black_list_company'] if 'black_list_company' in my_company else [],
+        embedding=my_company['description_embedded']
     )
-    
     proposals = repository_proposal.find_proposals(str(db_user['company']), role)
     recomend = True
     for proposal in proposals:

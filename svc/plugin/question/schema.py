@@ -5,7 +5,7 @@ from typing import Optional
 from pydantic_mongo import PydanticObjectId
 
 class Answer(BaseModel):
-    id: str  # Change this to make it public
+    id: str
     text: str
 
 class Question(BaseModel):

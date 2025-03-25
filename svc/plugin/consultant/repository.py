@@ -1,9 +1,6 @@
-from svc.utils.dataset import read_csv
-import os
 from svc.utils.database import db
 from .schema import Consultant, ConsultantPopulated
 from bson import ObjectId
-dataset = read_csv(os.environ["DB"])
 
 def consultant_list(black_list_focus_area: list = None, black_list_company: list = None):
     find = {}
@@ -14,6 +11,37 @@ def consultant_list(black_list_focus_area: list = None, black_list_company: list
 
     db_results = db.company.find(find)
     return [Consultant(**item).dict() for item in db_results]
+
+def find_consultants(black_list_focus_area: list = None, black_list_company: list = None, embedding: list = None):
+    find = {}
+    if black_list_focus_area is not None:
+        find["focus_areas"] = { "$nin": black_list_focus_area }
+    if black_list_company is not None:
+        find["_id"] = { "$nin": [ObjectId(c) for c in black_list_company] }
+
+    pipeline = [
+    ]
+    if embedding is not None:
+        pipeline.append(
+            {
+                "$vectorSearch": {
+                    "index": "vector_index",
+                    "queryVector": embedding,
+                    "path": "description_embedded",
+                    "numCandidates": 10,
+                    "limit": 5
+                }
+            }
+        )
+    pipeline.append(
+        {
+            "$match": find
+        }
+    )
+
+    db_results = db.company.aggregate(pipeline)
+    data = [Consultant(**item).dict() for item in db_results]
+    return data
 
 def create_user(body: dict):
     db.user.insert_one(body)
@@ -93,4 +121,3 @@ def update_consultant_details(
         update_fields["is_b2b"] = is_b2b
 
     return db.company.update_one({"_id": ObjectId(_id)}, {"$set": update_fields})
-

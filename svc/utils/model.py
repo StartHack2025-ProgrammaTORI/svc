@@ -1,5 +1,5 @@
 import os
-from openai import OpenAI
+from openai import OpenAI, embeddings
 
 class Model:
     history = []
@@ -23,6 +23,13 @@ class Model:
     def clear_history(self):
         self.history = []
 
+    def text_to_embedding(self, prompt):
+        response = embeddings.create(
+            input=prompt,
+            model="text-embedding-ada-002"
+        )
+        return response.data[0].embedding
+
     def answer(self, prompt=None, functions=None, function_call=None):
         if prompt is not None:
             self.history.append(
@@ -32,7 +39,6 @@ class Model:
                 }
             )
         if functions is not None:
-            print("brodooo: ",functions)
             return self.client.chat.completions.create(
                 model=self.model,
                 messages=self.history,

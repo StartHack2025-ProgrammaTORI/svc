@@ -1,19 +1,18 @@
 from dotenv import load_dotenv
-
 load_dotenv()
 
+from svc.utils.database import db
 from fastapi import FastAPI
 import os
 from svc.utils.firebase import initialize_firebase
 initialize_firebase()
 from fastapi.middleware.cors import CORSMiddleware
-from pymongo import MongoClient
-from svc.utils.dataset import read_csv
 from svc.utils.database import mongo_client
 from svc.plugin.consultant import controller as consultant_controller
 from svc.plugin.question import controller as question_controller
 from svc.plugin.todo import controller as todo_controller
 from svc.plugin.proposal import controller as recommendation_controller
+from svc.utils.model import Model
 
 app = FastAPI(version=os.environ["VERSION"])  # Added version prefix
 
@@ -52,16 +51,17 @@ def read_root():
         "environment": os.getenv("ENVIRONMENT", "development")  # Example usage of an env variable
     }
 
-# @app.get("/test")
-# def get_users():
-#     """
-#     Fetch all documents from the User collection.
-#     """
+# model = Model()
+
+# @app.get("/func")
+# def create_embeddings():
 #     try:
-#         csv_ = read_csv(os.environ["DB"])
-#         print("csv_", csv_.to_dict(orient="records"))
-#         db.company.insert_many(csv_.to_dict(orient="records"))
-#         users = list(db["User"].find({}, {"_id": 0}))  # Exclude the _id field from the response
-#         return {"users": users}
+#         for company in db.company.find():
+#             # Add description_embedded only if it doesn't exist
+#             description = model.text_to_embedding(company['description'])
+#             db.company.update_one(
+#                 {"_id": company["_id"], "description_embedded": {"$exists": False}},
+#                 {"$set": {"description_embedded": description}}
+#             )
 #     except Exception as e:
 #         return {"error": str(e)}
